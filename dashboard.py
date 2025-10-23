@@ -21,7 +21,7 @@ st.set_page_config(
 defaults = {
     'page': 'home',
     'selected_image_bytes': None,
-    'cnn_conf': 0.85
+    'cnn_conf': 0.5
 }
 for k, v in defaults.items():
     if k not in st.session_state:
@@ -192,12 +192,12 @@ def home_page():
     st.subheader("Pilih Tugas yang Ingin Dilakukan:")
     col1, col2 = st.columns(2)
     with col1:
-        st.markdown('<div class="menu-card"><h3>🌭 Deteksi Objek</h3><p>Gunakan model YOLO untuk mendeteksi Hotdog vs Not-Hotdog.</p></div>', unsafe_allow_html=True)
+        st.markdown('<div class="menu-card"><h3>🌭 Deteksi Objek</h3><p>Menggunakan model YOLO untuk mendeteksi Hotdog vs Not-Hotdog.</p></div>', unsafe_allow_html=True)
         if st.button("Mulai Deteksi", use_container_width=True, key="yolo_nav"):
             st.session_state.page = 'yolo'
             clear_image_state()
     with col2:
-        st.markdown('<div class="menu-card"><h3>🐆 Klasifikasi Gambar</h3><p>Gunakan model CNN untuk mengklasifikasikan Cheetah dan Hyena.</p></div>', unsafe_allow_html=True)
+        st.markdown('<div class="menu-card"><h3>🐆 Klasifikasi Gambar</h3><p>Menggunakan model CNN untuk mengklasifikasikan Cheetah dan Hyena.</p></div>', unsafe_allow_html=True)
         if st.button("Mulai Klasifikasi", use_container_width=True, key="cnn_nav"):
             st.session_state.page = 'cnn'
             clear_image_state()
@@ -245,11 +245,11 @@ def run_model_page(page_type):
         st.markdown("---")
 
         if page_type == 'cnn':
-            st.session_state.cnn_conf = st.slider("Min. Keyakinan (CNN)", 0.0, 1.0, st.session_state.cnn_conf, 0.05)
+            st.session_state.cnn_conf = st.slider("Min. Keyakinan", 0.0, 1.0, st.session_state.cnn_conf, 0.05)
             st.warning(f"Hasil di bawah {st.session_state.cnn_conf:.0%} akan ditolak.", icon="⚖️")
 
         if page_type == 'yolo':
-            confidence_threshold = st.slider("Tingkat Keyakinan (YOLO)", 0.0, 1.0, 0.5, 0.05, key="yolo_conf")
+            confidence_threshold = st.slider("Tingkat Keyakinan", 0.0, 1.0, 0.5, 0.05, key="yolo_conf")
 
         source_choice = st.radio("Pilih sumber gambar:", ["📤 Upload File", "📸 Ambil dari Kamera", "🔗 Input URL Gambar"], key=source_key)
 
