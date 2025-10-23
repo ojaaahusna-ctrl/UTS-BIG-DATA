@@ -143,6 +143,10 @@ div[data-baseweb="input"], div[data-baseweb="textarea"] {
 .stFileUploader > div > label {
     color: #2D3748 !important; 
 }
+
+button[title="View fullscreen"] {
+    visibility: hidden;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -296,7 +300,7 @@ def run_model_page(page_type):
         col1, col2 = st.columns(2)
         with col1:
             st.subheader("🖼️ Gambar Asli")
-            st.image(image, use_container_width=True)
+            st.image(result_img_rgb, use_container_width=True, channels="RGB", clamp=True, output_format="JPEG")
             if st.button("🗑️ Hapus Gambar & Reset", use_container_width=True, key=f"{page_type}_reset"):
                 reset_and_rerun()
 
