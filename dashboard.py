@@ -151,7 +151,7 @@ div[data-baseweb="input"], div[data-baseweb="textarea"] {
 @st.cache_resource(show_spinner="📦 Memuat model YOLO...")
 def load_yolo_model():
     try:
-        return YOLO("model/best.pt")
+        return YOLO("model/Raudhatul Husna_laporan4.pt")
     except Exception as e:
         st.error(f"❌ Gagal memuat model YOLO: {e}", icon="🔥")
         return None
@@ -159,7 +159,7 @@ def load_yolo_model():
 @st.cache_resource(show_spinner="📦 Memuat model CNN...")
 def load_cnn_model():
     try:
-        return tf.keras.models.load_model("compressed.h5", compile=False)
+        return tf.keras.models.load_model("Raudhatul Husna_laporan2.h5", compile=False)
     except Exception as e:
         st.error(f"❌ Gagal memuat model CNN: {e}", icon="🔥")
         return None
