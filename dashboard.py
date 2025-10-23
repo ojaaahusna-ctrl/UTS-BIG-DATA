@@ -148,33 +148,8 @@ button[title="View fullscreen"] {
     visibility: hidden;
 }
 
-/* ================== PERBAIKAN FINAL CSS DI SINI ================== */
-/* CSS untuk kotak hasil deteksi (seperti tombol) */
-.detection-result-box {
-    /* Properti style dari .stButton>button Anda */
-    background-color: #319795; /* Kembali ke warna tombol utama */
-    color: white !important;    /* Teks putih */
-    border-radius: 8px;
-    border: none;
-    padding: 8px 16px;
-    
-    /* Properti Layout & Ukuran */
-    width: 100%;
-    box-sizing: border-box;
-    margin-top: 1rem;
-    
-    /* KUNCI: Menyamakan tinggi & perataan dengan tombol */
-    min-height: 2.4rem;  /* Menyamakan tinggi minimum dengan st.button */
-    display: flex;
-    align-items: center;    /* Pusatkan vertikal */
-    justify-content: center; /* Pusatkan horizontal */
+/* ================== SEMUA CSS UNTUK KOTAK DETEKSI TELAH DIHAPUS ================== */
 
-    /* Properti Teks */
-    font-weight: 700;         /* Bold */
-    font-size: 1.2rem;        /* Ukuran teks lebih besar */
-    text-align: center;       /* Pastikan teks di tengah */
-}
-/* ================== AKHIR PERBAIKAN FINAL CSS ================== */
 </style>
 """, unsafe_allow_html=True)
 
@@ -366,14 +341,14 @@ def run_model_page(page_type):
                                     except Exception:
                                         cls_name = str(int(box.cls))
                                     
-                                    # --- PENGGUNAAN CLASS CSS YANG BARU ---
-                                    text = f"🎯 Objek {i+1}: {cls_name} | Keyakinan: {float(box.conf[0]):.2%}"
-                                    st.markdown(f'<div class="detection-result-box">{text}</div>', unsafe_allow_html=True)
+                                    # --- SOLUSI FINAL: Teks biasa tanpa box, besar, bold, dan tengah ---
+                                    text = f"🎯 Objek {i+1}: **{cls_name}** | Keyakinan: **{float(box.conf[0]):.2%}**"
+                                    st.markdown(f'<h4 style="text-align: center; color: #2D3748;">{text}</h4>', unsafe_allow_html=True)
                                     
                             else:
-                                # --- PENGGUNAAN CLASS CSS YANG BARU ---
-                                text = f"✅ Tidak ditemukan objek 'Hotdog' → Not-Hotdog"
-                                st.markdown(f'<div class="detection-result-box">{text}</div>', unsafe_allow_html=True)
+                                # --- SOLUSI FINAL: Teks biasa tanpa box, besar, bold, dan tengah ---
+                                text = f"✅ Tidak ditemukan objek 'Hotdog' → **Not-Hotdog**"
+                                st.markdown(f'<h4 style="text-align: center; color: #2D3748;">{text}</h4>', unsafe_allow_html=True)
                     else:
                         # Jika tidak ada hasil, tulis warning ke col2
                         with col2:
