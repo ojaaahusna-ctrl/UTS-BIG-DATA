@@ -148,8 +148,31 @@ button[title="View fullscreen"] {
     visibility: hidden;
 }
 
-/* ================== BLOK CSS YANG BERMASALAH TELAH DIHAPUS ================== */
+/* ================== PERBAIKAN DI SINI (1/3) ================== */
+/* CSS untuk kotak hasil deteksi, meniru style .stButton>button */
+.detection-result-box {
+    /* 1. Properti style dari .stButton>button Anda */
+    background-color: #319795;
+    color: white !important;
+    border-radius: 8px;
+    border: none;
+    padding: 8px 16px;
+    font-weight: 700;
+    
+    /* 2. Properti untuk layout */
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 1rem;
 
+    /* 3. KUNCI PERBAIKAN ALIGNMENT (INI YANG BARU) */
+    /* Samakan tinggi minimum dengan tombol Streamlit */
+    min-height: 2.4rem; 
+    /* Pusatkan teks di tengah (vertikal & horizontal) */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+/* ================== AKHIR PERBAIKAN CSS ================== */
 </style>
 """, unsafe_allow_html=True)
 
@@ -274,7 +297,7 @@ def run_model_page(page_type):
         elif source_choice == "🔗 Input URL Gambar":
             url = st.text_input("Masukkan URL Gambar:", value=st.session_state.get(url_key, ''), key=url_key)
             if url:
-                if not re.match(r'https?://[^\s/$.?#].[^\s]*$', url):
+                if not re.match(r'httpsK?://[^\s/$.?#].[^\s]*$', url):
                     st.error("❌ URL tidak valid.", icon="⚠️")
                 else:
                     try:
@@ -335,24 +358,20 @@ def run_model_page(page_type):
                             # Tampilkan TEKS/ALERT di bawahnya
                             boxes = results[0].boxes
                             if len(boxes) > 0:
-                                # --- INI ADALAH ALTERNATIF BARU ---
-                                # Buat kolom untuk setiap objek yang terdeteksi
-                                num_boxes = len(boxes)
-                                cols_metric = st.columns(num_boxes) 
-                                
                                 for i, box in enumerate(boxes):
-                                    with cols_metric[i]: # Tampilkan setiap metrik di kolomnya
-                                        try:
-                                            cls_name = model.names[int(box.cls)]
-                                        except Exception:
-                                            cls_name = str(int(box.cls))
-                                        
-                                        conf_percent = float(box.conf[0]) * 100
-                                        # Gunakan st.metric untuk tampilan yang jauh lebih baik
-                                        st.metric(f"Objek {i+1}", f"{cls_name}", f"{conf_percent:.2f}%")
+                                    try:
+                                        cls_name = model.names[int(box.cls)]
+                                    except Exception:
+                                        cls_name = str(int(box.cls))
+                                    
+                                    # --- KEMBALI KE KOTAK KUSTOM ANDA ---
+                                    text = f"🎯 Objek {i+1}: <b>{cls_name}</b> | Keyakinan: <b>{float(box.conf[0]):.2%}</b>"
+                                    st.markdown(f'<div class="detection-result-box">{text}</div>', unsafe_allow_html=True)
+                                    
                             else:
-                                # Jika tidak ada, st.success sudah terlihat bagus dan pas
-                                st.success("✅ Tidak ditemukan objek 'Hotdog' → Not-Hotdog")
+                                # --- KEMBALI KE KOTAK KUSTOM ANDA ---
+                                text = f"✅ Tidak ditemukan objek 'Hotdog' → <b>Not-Hotdog</b>"
+                                st.markdown(f'<div class="detection-result-box">{text}</div>', unsafe_allow_html=True)
                     else:
                         # Jika tidak ada hasil, tulis warning ke col2
                         with col2:
