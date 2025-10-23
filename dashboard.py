@@ -148,15 +148,15 @@ button[title="View fullscreen"] {
     visibility: hidden;
 }
 
-/* ================== IDE BARU: CSS UNTUK KETERANGAN GAMBAR ================== */
+/* ================== PERBAIKAN CSS UNTUK KETERANGAN GAMBAR (FINAL) ================== */
 .detection-caption {
     text-align: center;
-    font-weight: 700;         /* Bold */
-    font-size: 1.1rem;        /* Sedikit lebih besar dari teks normal */
-    color: #2D3748 !important; /* Warna teks utama Anda */
-    margin-top: 0.5rem;       /* Jarak sedikit dari gambar di atasnya */
+    font-weight: 800;          /* Lebih bold lagi (extra-bold) */
+    font-size: 1.3rem;         /* Ukuran teks lebih besar */
+    color: #1A202C !important; /* Warna teks label (Objek, Akurasi) menjadi hitam pekat */
+    margin-top: 0.8rem;        /* Jarak lebih sedikit dari gambar di atasnya */
 }
-/* ================== AKHIR PERUBAHAN CSS ================== */
+/* ================== AKHIR PERBAHAN CSS ================== */
 </style>
 """, unsafe_allow_html=True)
 
@@ -339,7 +339,7 @@ def run_model_page(page_type):
                             # Tampilkan GAMBAR DULU
                             st.image(result_img_rgb, use_container_width=True, channels="RGB", output_format="JPEG")
 
-                            # --- IDE BARU: Tampilkan hasil sebagai KETERANGAN (CAPTION) di bawah gambar ---
+                            # --- IDE FINAL: Bold, Besar, Warna Menarik ---
                             boxes = results[0].boxes
                             if len(boxes) > 0:
                                 for i, box in enumerate(boxes):
@@ -348,13 +348,13 @@ def run_model_page(page_type):
                                     except Exception:
                                         cls_name = str(int(box.cls))
                                     
-                                    text = f"Objek {i+1}: <b>{cls_name}</b> | Akurasi: <b>{float(box.conf[0]):.2%}</b>" 
-                                    # Kita gunakan tag <p> dengan class baru
+                                    # Gunakan <span> untuk warna spesifik
+                                    text = f"Objek {i+1}: <span style='color: #319795;'><b>{cls_name}</b></span> | Akurasi: <span style='color: #319795;'><b>{float(box.conf[0]):.2%}</b></span>" 
                                     st.markdown(f'<p class="detection-caption">{text}</p>', unsafe_allow_html=True)
                                     
                             else:
-                                text = f"Tidak ditemukan objek 'Hotdog' → <b>Not-Hotdog</b>"
-                                # Kita gunakan tag <p> dengan class baru
+                                # Untuk kasus 'Not-Hotdog', kita juga beri warna menarik
+                                text = f"Tidak ditemukan objek 'Hotdog' → <span style='color: #E53E3E;'><b>Not-Hotdog</b></span>" # Warna merah untuk "Not-Hotdog"
                                 st.markdown(f'<p class="detection-caption">{text}</p>', unsafe_allow_html=True)
                     else:
                         # Jika tidak ada hasil, tulis warning ke col2
