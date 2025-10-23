@@ -124,6 +124,16 @@ h1, h2, h3, h4, h5, h6, p, li, label, .stMarkdown, .stText,
 }
 .stButton>button:hover { background-color: #2C7A7B; }
 
+/* ================== PERBAIKAN CSS ================== */
+/* Style untuk tombol yang di-disable agar tetap terlihat jelas */
+.stButton>button:disabled {
+    background-color: #319795;
+    color: white !important;
+    opacity: 0.8; /* Sedikit lebih pudar tapi tetap terlihat */
+    border: none;
+}
+/* ================== AKHIR PERBAIKAN CSS ================== */
+
 div[data-baseweb="input"], div[data-baseweb="textarea"] {
     background-color: #FFFFFF !important;
     border-radius: 8px;
@@ -146,19 +156,6 @@ div[data-baseweb="input"], div[data-baseweb="textarea"] {
 
 button[title="View fullscreen"] {
     visibility: hidden;
-}
-
-/* CSS untuk kotak hasil deteksi, meniru style .stButton>button */
-.detection-result-box {
-    background-color: #319795;  /* Warna tombol */
-    color: white !important;    /* Warna teks tombol */
-    border-radius: 8px;       /* Radius tombol */
-    border: none;
-    padding: 8px 16px;        /* Padding tombol */
-    font-weight: 700;         /* Berat font tombol */
-    text-align: center;       /* Teks di tengah */
-    margin-top: 1rem;         /* Jarak dari gambar di atasnya */
-    font-family: 'Inter', sans-serif;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -317,11 +314,8 @@ def run_model_page(page_type):
             if st.button("🗑️ Hapus Gambar & Reset", use_container_width=True, key=f"{page_type}_reset"):
                 reset_and_rerun()
         
-        # ================== PERBAIKAN LOGIKA DI SINI ==================
-        
-        # 1. Buat placeholder di col2
+        # Logika placeholder yang benar
         placeholder = col2.empty()
-        # 2. Isi placeholder dengan pesan awal
         placeholder.info("Tekan tombol di bawah untuk memproses gambar.")
 
         if st.button(button_text, use_container_width=True, key=f"{page_type}_predict"):
@@ -336,13 +330,13 @@ def run_model_page(page_type):
                         plot_result = cv2.resize(plot_result, (orig_w, orig_h))
                         result_img_rgb = cv2.cvtColor(plot_result, cv2.COLOR_BGR2RGB)
                         
-                        # 3. Ganti isi placeholder dengan 'container' baru
+                        # Ganti isi placeholder dengan 'container' baru
                         with placeholder.container():
                             st.subheader("🎯 Hasil Deteksi")
-                            # 4. Tulis gambar DULU
+                            # Tulis gambar DULU
                             st.image(result_img_rgb, use_container_width=True, channels="RGB", output_format="JPEG")
 
-                            # 5. Tulis teks/alert DI BAWAHNYA
+                            # Tulis teks/alert DI BAWAHNYA
                             boxes = results[0].boxes
                             if len(boxes) > 0:
                                 for i, box in enumerate(boxes):
@@ -351,12 +345,16 @@ def run_model_page(page_type):
                                     except Exception:
                                         cls_name = str(int(box.cls))
                                     
-                                    text = f"🎯 Objek {i+1}: <b>{cls_name}</b> | Keyakinan: <b>{float(box.conf[0]):.2%}</b>"
-                                    st.markdown(f'<div class="detection-result-box">{text}</div>', unsafe_allow_html=True)
+                                    # ================== PERBAIKAN DI SINI (1/2) ==================
+                                    # Mengganti st.markdown dengan st.button(disabled=True)
+                                    text = f"🎯 Objek {i+1}: {cls_name} | Keyakinan: {float(box.conf[0]):.2%}"
+                                    st.button(text, use_container_width=True, disabled=True, key=f"result_{i}")
                                     
                             else:
-                                text = f"✅ Tidak ditemukan objek 'Hotdog' → <b>Not-Hotdog</b>"
-                                st.markdown(f'<div class="detection-result-box">{text}</div>', unsafe_allow_html=True)
+                                # ================== PERBAIKAN DI SINI (2/2) ==================
+                                # Mengganti st.markdown dengan st.button(disabled=True)
+                                text = "✅ Tidak ditemukan objek 'Hotdog' → Not-Hotdog"
+                                st.button(text, use_container_width=True, disabled=True, key="result_not")
                     else:
                         # Jika tidak ada hasil, ganti isi placeholder
                         with placeholder.container():
@@ -378,7 +376,7 @@ def run_model_page(page_type):
                         pred_prob = float(np.max(preds_output))
                         preds_for_display = [float(x) for x in preds_output]
 
-                    # 3. Ganti isi placeholder dengan 'container' baru
+                    # Ganti isi placeholder dengan 'container' baru
                     with placeholder.container():
                         st.subheader("🎯 Hasil Prediksi")
                         if pred_prob >= st.session_state.cnn_conf:
