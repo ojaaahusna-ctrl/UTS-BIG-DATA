@@ -148,8 +148,15 @@ button[title="View fullscreen"] {
     visibility: hidden;
 }
 
-/* ================== SEMUA CSS UNTUK KOTAK DETEKSI TELAH DIHAPUS ================== */
-
+/* ================== IDE BARU: CSS UNTUK KETERANGAN GAMBAR ================== */
+.detection-caption {
+    text-align: center;
+    font-weight: 700;         /* Bold */
+    font-size: 1.1rem;        /* Sedikit lebih besar dari teks normal */
+    color: #2D3748 !important; /* Warna teks utama Anda */
+    margin-top: 0.5rem;       /* Jarak sedikit dari gambar di atasnya */
+}
+/* ================== AKHIR PERUBAHAN CSS ================== */
 </style>
 """, unsafe_allow_html=True)
 
@@ -332,7 +339,7 @@ def run_model_page(page_type):
                             # Tampilkan GAMBAR DULU
                             st.image(result_img_rgb, use_container_width=True, channels="RGB", output_format="JPEG")
 
-                            # Tampilkan TEKS/ALERT di bawahnya
+                            # --- IDE BARU: Tampilkan hasil sebagai KETERANGAN (CAPTION) di bawah gambar ---
                             boxes = results[0].boxes
                             if len(boxes) > 0:
                                 for i, box in enumerate(boxes):
@@ -341,15 +348,14 @@ def run_model_page(page_type):
                                     except Exception:
                                         cls_name = str(int(box.cls))
                                     
-                                    # --- SOLUSI FINAL (HTML Murni) ---
-                                    # Kita gunakan tag <b> untuk bold, bukan **
                                     text = f"Objek {i+1}: <b>{cls_name}</b> | Akurasi: <b>{float(box.conf[0]):.2%}</b>" 
-                                    st.markdown(f'<h4 style="text-align: center; color: #2D3748; margin-top: 1rem;">{text}</h4>', unsafe_allow_html=True)
+                                    # Kita gunakan tag <p> dengan class baru
+                                    st.markdown(f'<p class="detection-caption">{text}</p>', unsafe_allow_html=True)
                                     
                             else:
-                                # --- SOLUSI FINAL (HTML Murni) ---
                                 text = f"Tidak ditemukan objek 'Hotdog' → <b>Not-Hotdog</b>"
-                                st.markdown(f'<h4 style="text-align: center; color: #2D3748; margin-top: 1rem;">{text}</h4>', unsafe_allow_html=True)
+                                # Kita gunakan tag <p> dengan class baru
+                                st.markdown(f'<p class="detection-caption">{text}</p>', unsafe_allow_html=True)
                     else:
                         # Jika tidak ada hasil, tulis warning ke col2
                         with col2:
