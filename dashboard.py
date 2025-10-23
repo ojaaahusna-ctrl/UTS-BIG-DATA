@@ -160,6 +160,11 @@ button[title="View fullscreen"] {
     text-align: center;       /* Teks di tengah */
     margin-top: 1rem;         /* Jarak dari gambar di atasnya */
     font-family: 'Inter', sans-serif;
+
+    /* ===== INI ADALAH PERUBAHAN UNTUK MENYEJAJARKAN ===== */
+    width: 100%;
+    box-sizing: border-box;
+    /* ===== AKHIR PERUBAHAN ===== */
 }
 /* ================== AKHIR PERBAIKAN CSS ================== */
 </style>
@@ -342,9 +347,7 @@ def run_model_page(page_type):
                         with col2:
                             st.subheader("🎯 Hasil Deteksi")
                             # Tampilkan GAMBAR DULU
-                            # ================== INI ADALAH PERBAIKAN YANG DIMINTA ==================
-                            # st.image(result_img_rgb, use_container_width=True, channels="RGB", output_format="JPEG")
-                            # ================== AKHIR PERBAIKAN ==================
+                            st.image(result_img_rgb, use_container_width=True, channels="RGB", output_format="JPEG")
 
                             # Tampilkan TEKS/ALERT di bawahnya
                             boxes = results[0].boxes
