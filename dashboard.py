@@ -148,8 +148,39 @@ button[title="View fullscreen"] {
     visibility: hidden;
 }
 
-/* ================== CSS BERMASALAH TELAH DIHAPUS ================== */
+/* ================== PERBAIKAN BARU DI SINI ================== */
+/* Base style untuk kotak hasil, agar sejajar & di tengah */
+.result-box-base {
+    /* Properti Layout & Ukuran */
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 1rem;
+    padding: 8px 16px;
+    border-radius: 8px;
+    
+    /* KUNCI: Menyamakan tinggi & perataan dengan tombol */
+    min-height: 2.4rem;  /* Menyamakan tinggi minimum dengan st.button */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
+    /* Properti Teks */
+    font-weight: 700;         /* Ini membuat tulisan BOLD */
+    color: #2D3748 !important; /* Warna teks gelap (dari tema Anda) */
+}
+
+/* Warna untuk "Hotdog" (Biru/Teal Muda) */
+.result-box-info {
+    background-color: rgba(49, 151, 149, 0.15); /* Latar belakang teal transparan */
+    border: 1px solid rgba(49, 151, 149, 0.3);  /* Border teal tipis */
+}
+
+/* Warna untuk "Not-Hotdog" (Hijau Muda) */
+.result-box-success {
+    background-color: #F0FFF4; /* Latar belakang hijau (dari st.success) */
+    border: 1px solid #B2F5EA; /* Border hijau/teal (dari tema Anda) */
+}
+/* ================== AKHIR PERBAIKAN CSS ================== */
 </style>
 """, unsafe_allow_html=True)
 
@@ -341,15 +372,15 @@ def run_model_page(page_type):
                                     except Exception:
                                         cls_name = str(int(box.cls))
                                     
-                                    # --- SOLUSI BARU: Menggunakan st.info ---
-                                    # Tulisannya bisa pakai Markdown (bold)
-                                    text = f"Objek {i+1}: **{cls_name}** | Keyakinan: **{float(box.conf[0]):.2%}**"
-                                    st.info(text, icon="🎯")
+                                    # --- SOLUSI FINAL (CSS Kustom) ---
+                                    # Teks akan otomatis BOLD dan CENTER dari CSS
+                                    text = f"🎯 Objek {i+1}: {cls_name} | Keyakinan: {float(box.conf[0]):.2%}"
+                                    st.markdown(f'<div class="result-box-base result-box-info">{text}</div>', unsafe_allow_html=True)
                                     
                             else:
-                                # --- SOLUSI BARU: Menggunakan st.success ---
-                                text = f"Tidak ditemukan objek 'Hotdog' → **Not-Hotdog**"
-                                st.success(text, icon="✅")
+                                # --- SOLUSI FINAL (CSS Kustom) ---
+                                text = f"✅ Tidak ditemukan objek 'Hotdog' → Not-Hotdog"
+                                st.markdown(f'<div class="result-box-base result-box-success">{text}</div>', unsafe_allow_html=True)
                     else:
                         # Jika tidak ada hasil, tulis warning ke col2
                         with col2:
