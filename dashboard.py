@@ -159,7 +159,7 @@ def load_yolo_model():
 @st.cache_resource(show_spinner="📦 Memuat model CNN...")
 def load_cnn_model():
     try:
-        return tf.keras.models.load_model("Raudhatul Husna_laporan2.h5", compile=False)
+        return tf.keras.models.load_model("model/Raudhatul Husna_laporan2.h5", compile=False)
     except Exception as e:
         st.error(f"❌ Gagal memuat model CNN: {e}", icon="🔥")
         return None
