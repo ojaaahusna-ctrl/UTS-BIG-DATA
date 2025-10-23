@@ -300,41 +300,38 @@ def run_model_page(page_type):
         col1, col2 = st.columns(2)
         with col1:
             st.subheader("🖼️ Gambar Asli")
-            # Ini sudah benar, menampilkan gambar asli
             st.image(image, use_container_width=True, channels="RGB", clamp=True, output_format="JPEG")
             if st.button("🗑️ Hapus Gambar & Reset", use_container_width=True, key=f"{page_type}_reset"):
                 reset_and_rerun()
-
-        # ================== PERBAIKAN DI SINI ==================
-        # Kita buat DUA placeholder: satu untuk gambar, satu untuk teks/alert
-        image_placeholder = col2.empty()
-        text_placeholder = col2.empty()
-
-        # Pesan awal ditaruh di placeholder gambar
-        image_placeholder.info("Tekan tombol di bawah untuk memproses gambar.")
-        # ========================================================
+        
+        # ================== PERBAIKAN UTAMA DI SINI ==================
+        
+        # 1. Buat placeholder HANYA untuk pesan awal
+        placeholder = col2.empty()
+        placeholder.info("Tekan tombol di bawah untuk memproses gambar.")
 
         if st.button(button_text, use_container_width=True, key=f"{page_type}_predict"):
             with st.spinner("🧠 Menganalisis gambar..."):
+                
+                # 2. HAPUS pesan awal ("Tekan tombol...")
+                placeholder.empty()
+
                 if page_type == 'yolo':
                     results = model(image, conf=confidence_threshold)
                     plot_result = results[0].plot(show=False)
 
                     if plot_result is not None:
-                        # ✅ Samakan ukuran hasil deteksi dengan ukuran gambar asli
                         orig_w, orig_h = image.size
                         plot_result = cv2.resize(plot_result, (orig_w, orig_h))
-
                         result_img_rgb = cv2.cvtColor(plot_result, cv2.COLOR_BGR2RGB)
                         
-                        # ================== PERBAIKAN DI SINI ==================
-                        # Tampilkan gambar di placeholder PERTAMA
-                        with image_placeholder.container():
+                        # 3. Tulis hasil LANGSUNG ke col2 secara berurutan
+                        with col2:
                             st.subheader("🎯 Hasil Deteksi")
-                            st.image(result_img_rgb, use_container_width=True)
+                            # Tampilkan GAMBAR DULU
+                            st.image(result_img_rgb, use_container_width=True, channels="RGB", output_format="JPEG")
 
-                        # Tampilkan teks/alert di placeholder KEDUA
-                        with text_placeholder.container():
+                            # Tampilkan TEKS/ALERT di bawahnya
                             boxes = results[0].boxes
                             if len(boxes) > 0:
                                 for i, box in enumerate(boxes):
@@ -345,17 +342,17 @@ def run_model_page(page_type):
                                     st.success(f"Objek {i+1}: `{cls_name}` | Keyakinan: `{float(box.conf[0]):.2%}`")
                             else:
                                 st.success("✅ Tidak ditemukan objek 'Hotdog' → **Not-Hotdog**", icon="👍")
-                        # ========================================================
                     else:
-                        # Jika tidak ada hasil, tampilkan di placeholder pertama
-                        image_placeholder.warning("Tidak ada hasil deteksi.")
-                        text_placeholder.empty() # Kosongkan placeholder kedua
-                else:
+                        # Jika tidak ada hasil, tulis warning ke col2
+                        with col2:
+                            st.warning("Tidak ada hasil deteksi.")
+                
+                else: # page_type == 'cnn'
                     CLASS_NAMES_CNN = {0: "Cheetah 🐆", 1: "Hyena 🐕"}
                     input_shape = model.input_shape[1:3]
-                    img_array = np.expand_dims(np.array(image.resize(input_shape)) / 255.0, axis=0)
+                    # ... (logika prediksi CNN) ...
                     preds_output = model.predict(img_array, verbose=0)[0]
-
+                    
                     if len(preds_output) == 1:
                         prob = float(preds_output[0])
                         pred_idx = 1 if prob > 0.5 else 0
@@ -366,13 +363,12 @@ def run_model_page(page_type):
                         pred_prob = float(np.max(preds_output))
                         preds_for_display = [float(x) for x in preds_output]
 
-                    # ================== PERBAIKAN DI SINI ==================
-                    # Tampilkan semua hasil CNN (non-gambar) di placeholder PERTAMA
-                    with image_placeholder.container():
+                    # 3. Tulis hasil LANGSUNG ke col2
+                    with col2:
                         st.subheader("🎯 Hasil Prediksi")
                         if pred_prob >= st.session_state.cnn_conf:
                             st.metric("Prediksi:", CLASS_NAMES_CNN[pred_idx])
-                            st.metric("KeyakinAN:", f"{pred_prob:.2%}")
+                            st.metric("Keyakinan:", f"{pred_prob:.2%}")
                             st.success(f"Gambar terdeteksi sebagai {CLASS_NAMES_CNN[pred_idx]}.", icon="✅")
                             st.subheader("📊 Distribusi Probabilitas")
                             for i, p in enumerate(preds_for_display):
@@ -380,10 +376,8 @@ def run_model_page(page_type):
                         else:
                             st.error("❌ Gambar Tidak Terdeteksi", icon="🚫")
                             st.warning(f"Keyakinan tertinggi ({pred_prob:.2%}) di bawah ambang batas ({st.session_state.cnn_conf:.2%}).")
-                    
-                    # Kosongkan placeholder KEDUA
-                    text_placeholder.empty()
-                    # ========================================================
+        
+        # ================== AKHIR PERBAIKAN ==================
 
 # ================== ROUTER UTAMA ==================
 if st.session_state.page == 'home':
