@@ -147,6 +147,17 @@ div[data-baseweb="input"], div[data-baseweb="textarea"] {
 button[title="View fullscreen"] {
     visibility: hidden;
 }
+
+/* CSS untuk kotak sukses kustom kita */
+.custom-success-box {
+    background-color: #D4EDDA;
+    border: 1px solid #C3E6CB;
+    color: #155724;
+    padding: 0.75rem 1.25rem;
+    border-radius: 0.25rem;
+    margin-top: 1rem;
+    font-family: 'Inter', sans-serif;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -304,16 +315,14 @@ def run_model_page(page_type):
             if st.button("🗑️ Hapus Gambar & Reset", use_container_width=True, key=f"{page_type}_reset"):
                 reset_and_rerun()
         
-        # ================== PERBAIKAN UTAMA DI SINI ==================
-        
-        # 1. Buat placeholder HANYA untuk pesan awal
+        # Buat placeholder HANYA untuk pesan awal
         placeholder = col2.empty()
         placeholder.info("Tekan tombol di bawah untuk memproses gambar.")
 
         if st.button(button_text, use_container_width=True, key=f"{page_type}_predict"):
             with st.spinner("🧠 Menganalisis gambar..."):
                 
-                # 2. HAPUS pesan awal ("Tekan tombol...")
+                # HAPUS pesan awal ("Tekan tombol...")
                 placeholder.empty()
 
                 if page_type == 'yolo':
@@ -325,7 +334,7 @@ def run_model_page(page_type):
                         plot_result = cv2.resize(plot_result, (orig_w, orig_h))
                         result_img_rgb = cv2.cvtColor(plot_result, cv2.COLOR_BGR2RGB)
                         
-                        # 3. Tulis hasil LANGSUNG ke col2 secara berurutan
+                        # Tulis hasil LANGSUNG ke col2 secara berurutan
                         with col2:
                             st.subheader("🎯 Hasil Deteksi")
                             # Tampilkan GAMBAR DULU
@@ -339,9 +348,17 @@ def run_model_page(page_type):
                                         cls_name = model.names[int(box.cls)]
                                     except Exception:
                                         cls_name = str(int(box.cls))
-                                    st.success(f"Objek {i+1}: `{cls_name}` | Keyakinan: `{float(box.conf[0]):.2%}`")
+                                    
+                                    # ================== PERBAIKAN DI SINI (1/2) ==================
+                                    # Mengganti st.success dengan st.markdown HTML
+                                    text = f"Objek {i+1}: <b>{cls_name}</b> | Keyakinan: <b>{float(box.conf[0]):.2%}</b>"
+                                    st.markdown(f'<div class="custom-success-box">{text}</div>', unsafe_allow_html=True)
+                                    
                             else:
-                                st.success("✅ Tidak ditemukan objek 'Hotdog' → **Not-Hotdog**", icon="👍")
+                                # ================== PERBAIKAN DI SINI (2/2) ==================
+                                # Mengganti st.success dengan st.markdown HTML
+                                text = f"✅ Tidak ditemukan objek 'Hotdog' → <b>Not-Hotdog</b>"
+                                st.markdown(f'<div class="custom-success-box">{text}</div>', unsafe_allow_html=True)
                     else:
                         # Jika tidak ada hasil, tulis warning ke col2
                         with col2:
@@ -350,7 +367,7 @@ def run_model_page(page_type):
                 else: # page_type == 'cnn'
                     CLASS_NAMES_CNN = {0: "Cheetah 🐆", 1: "Hyena 🐕"}
                     input_shape = model.input_shape[1:3]
-                    # ... (logika prediksi CNN) ...
+                    img_array = np.expand_dims(np.array(image.resize(input_shape)) / 255.0, axis=0)
                     preds_output = model.predict(img_array, verbose=0)[0]
                     
                     if len(preds_output) == 1:
@@ -363,7 +380,7 @@ def run_model_page(page_type):
                         pred_prob = float(np.max(preds_output))
                         preds_for_display = [float(x) for x in preds_output]
 
-                    # 3. Tulis hasil LANGSUNG ke col2
+                    # Tulis hasil LANGSUNG ke col2
                     with col2:
                         st.subheader("🎯 Hasil Prediksi")
                         if pred_prob >= st.session_state.cnn_conf:
@@ -376,8 +393,6 @@ def run_model_page(page_type):
                         else:
                             st.error("❌ Gambar Tidak Terdeteksi", icon="🚫")
                             st.warning(f"Keyakinan tertinggi ({pred_prob:.2%}) di bawah ambang batas ({st.session_state.cnn_conf:.2%}).")
-        
-        # ================== AKHIR PERBAIKAN ==================
 
 # ================== ROUTER UTAMA ==================
 if st.session_state.page == 'home':
