@@ -342,7 +342,9 @@ def run_model_page(page_type):
                         with col2:
                             st.subheader("🎯 Hasil Deteksi")
                             # Tampilkan GAMBAR DULU
-                            st.image(result_img_rgb, use_container_width=True, channels="RGB", output_format="JPEG")
+                            # ================== INI ADALAH PERBAIKAN YANG DIMINTA ==================
+                            # st.image(result_img_rgb, use_container_width=True, channels="RGB", output_format="JPEG")
+                            # ================== AKHIR PERBAIKAN ==================
 
                             # Tampilkan TEKS/ALERT di bawahnya
                             boxes = results[0].boxes
