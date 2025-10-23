@@ -148,26 +148,8 @@ button[title="View fullscreen"] {
     visibility: hidden;
 }
 
-/* ================== PERBAIKAN DI SINI (1/3) ================== */
-/* CSS untuk kotak hasil deteksi, meniru style .stButton>button */
-.detection-result-box {
-    /* Properti yang DITIRU PERSIS dari .stButton>button */
-    background-color: #319795;
-    color: white !important;
-    border-radius: 8px;
-    border: none;
-    padding: 8px 16px;        /* DIKEMBALIKAN agar sama persis dengan tombol */
-    font-weight: 700;
-    
-    /* Properti tambahan untuk layout kotak */
-    text-align: center;       /* Dibutuhkan oleh <div> */
-    margin-top: 1rem;         /* Jarak dari gambar di atasnya */
-    width: 100%;              /* Samakan lebar dengan tombol */
-    box-sizing: border-box;   /* Pastikan padding tidak merusak lebar */
+/* ================== BLOK CSS YANG BERMASALAH TELAH DIHAPUS ================== */
 
-    /* Menghapus semua properti tinggi/flex yang salah sebelumnya */
-}
-/* ================== AKHIR PERBAIKAN CSS ================== */
 </style>
 """, unsafe_allow_html=True)
 
@@ -353,22 +335,24 @@ def run_model_page(page_type):
                             # Tampilkan TEKS/ALERT di bawahnya
                             boxes = results[0].boxes
                             if len(boxes) > 0:
+                                # --- INI ADALAH ALTERNATIF BARU ---
+                                # Buat kolom untuk setiap objek yang terdeteksi
+                                num_boxes = len(boxes)
+                                cols_metric = st.columns(num_boxes) 
+                                
                                 for i, box in enumerate(boxes):
-                                    try:
-                                        cls_name = model.names[int(box.cls)]
-                                    except Exception:
-                                        cls_name = str(int(box.cls))
-                                    
-                                    # ================== PERBAIKAN DI SINI (2/3) ==================
-                                    # Mengganti st.success dengan st.markdown HTML
-                                    text = f"🎯 Objek {i+1}: <b>{cls_name}</b> | Keyakinan: <b>{float(box.conf[0]):.2%}</b>"
-                                    st.markdown(f'<div class="detection-result-box">{text}</div>', unsafe_allow_html=True)
-                                    
+                                    with cols_metric[i]: # Tampilkan setiap metrik di kolomnya
+                                        try:
+                                            cls_name = model.names[int(box.cls)]
+                                        except Exception:
+                                            cls_name = str(int(box.cls))
+                                        
+                                        conf_percent = float(box.conf[0]) * 100
+                                        # Gunakan st.metric untuk tampilan yang jauh lebih baik
+                                        st.metric(f"Objek {i+1}", f"{cls_name}", f"{conf_percent:.2f}%")
                             else:
-                                # ================== PERBAIKAN DI SINI (3/3) ==================
-                                # Mengganti st.success dengan st.markdown HTML
-                                text = f"✅ Tidak ditemukan objek 'Hotdog' → <b>Not-Hotdog</b>"
-                                st.markdown(f'<div class="detection-result-box">{text}</div>', unsafe_allow_html=True)
+                                # Jika tidak ada, st.success sudah terlihat bagus dan pas
+                                st.success("✅ Tidak ditemukan objek 'Hotdog' → Not-Hotdog")
                     else:
                         # Jika tidak ada hasil, tulis warning ke col2
                         with col2:
