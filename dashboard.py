@@ -339,7 +339,7 @@ def run_model_page(page_type):
                             # Tampilkan GAMBAR DULU
                             st.image(result_img_rgb, use_container_width=True, channels="RGB", output_format="JPEG")
 
-                            # --- IDE FINAL: Bold, Besar, Warna Menarik ---
+                            
                             boxes = results[0].boxes
                             if len(boxes) > 0:
                                 for i, box in enumerate(boxes):
@@ -349,11 +349,11 @@ def run_model_page(page_type):
                                         cls_name = str(int(box.cls))
                                     
                                     # Gunakan <span> untuk warna spesifik
-                                    text = f"Objek {i+1}: <span style='color: #319795;'><b>{cls_name}</b></span> | Akurasi: <span style='color: #319795;'><b>{float(box.conf[0]):.2%}</b></span>" 
+                                    text = f"Objek : <span style='color: #319795;'><b>{cls_name}</b></span> | Akurasi: <span style='color: #319795;'><b>{float(box.conf[0]):.2%}</b></span>" 
                                     st.markdown(f'<p class="detection-caption">{text}</p>', unsafe_allow_html=True)
                                     
                             else:
-                                # Untuk kasus 'Not-Hotdog', kita juga beri warna menarik
+                              
                                 text = f"Tidak ditemukan objek 'Hotdog' → <span style='color: #E53E3E;'><b>Not-Hotdog</b></span>" # Warna merah untuk "Not-Hotdog"
                                 st.markdown(f'<p class="detection-caption">{text}</p>', unsafe_allow_html=True)
                     else:
