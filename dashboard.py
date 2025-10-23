@@ -341,14 +341,15 @@ def run_model_page(page_type):
                                     except Exception:
                                         cls_name = str(int(box.cls))
                                     
-                                    # --- SOLUSI FINAL: Teks biasa tanpa box, besar, bold, dan tengah ---
-                                    text = f"Objek {i+1}: **{cls_name}** | Akurasi: **{float(box.conf[0]):.2%}**" # Ikon bintang hilang, 'Keyakinan' jadi 'Akurasi'
-                                    st.markdown(f'<h4 style="text-align: center; color: #2D3748; margin-top: 1rem;">{text}</h4>', unsafe_allow_html=True) # Tambah margin-top
+                                    # --- SOLUSI FINAL (HTML Murni) ---
+                                    # Kita gunakan tag <b> untuk bold, bukan **
+                                    text = f"Objek {i+1}: <b>{cls_name}</b> | Akurasi: <b>{float(box.conf[0]):.2%}</b>" 
+                                    st.markdown(f'<h4 style="text-align: center; color: #2D3748; margin-top: 1rem;">{text}</h4>', unsafe_allow_html=True)
                                     
                             else:
-                                # --- SOLUSI FINAL: Teks biasa tanpa box, besar, bold, dan tengah ---
-                                text = f"Tidak ditemukan objek 'Hotdog' → **Not-Hotdog**" # Ikon bintang hilang
-                                st.markdown(f'<h4 style="text-align: center; color: #2D3748; margin-top: 1rem;">{text}</h4>', unsafe_allow_html=True) # Tambah margin-top
+                                # --- SOLUSI FINAL (HTML Murni) ---
+                                text = f"Tidak ditemukan objek 'Hotdog' → <b>Not-Hotdog</b>"
+                                st.markdown(f'<h4 style="text-align: center; color: #2D3748; margin-top: 1rem;">{text}</h4>', unsafe_allow_html=True)
                     else:
                         # Jika tidak ada hasil, tulis warning ke col2
                         with col2:
