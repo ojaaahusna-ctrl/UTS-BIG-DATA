@@ -155,20 +155,22 @@ button[title="View fullscreen"] {
     color: white !important;    /* Warna teks tombol */
     border-radius: 8px;       /* Radius tombol */
     border: none;
-    padding: 8px 16px;        /* Padding tombol */
-    font-weight: 700;         /* Berat font tombol */
-    text-align: center;       /* Teks di tengah */
-    margin-top: 1rem;         /* Jarak dari gambar di atasnya */
-    font-family: 'Inter', sans-serif;
     
+    /* --- INI ADALAH PERUBAHAN UTAMA --- */
+    /* Kita samakan padding-nya persis dengan tombol */
+    padding: 0.5rem 1rem;       /* Mengganti '8px 16px' */
+    font-weight: 700;         /* Berat font tombol */
+    
+    margin-top: 1rem;         /* Jarak dari gambar di atasnya */
     width: 100%;              /* Samakan lebar dengan tombol */
     box-sizing: border-box;   /* Pastikan padding tidak merusak lebar */
 
-    /* ===== INI ADALAH PERUBAHAN UNTUK MENYAMAKAN TINGGI ===== */
-    display: flex;            /* Aktifkan flexbox */
-    align-items: center;      /* Pusatkan konten secara vertikal */
-    justify-content: center;  /* Pusatkan konten secara horizontal */
-    height: 2.4rem;           /* Samakan TINGGI (height) dengan tombol Streamlit */
+    /* Mengatur perataan teks di dalam kotak */
+    display: flex;            
+    align-items: center;      
+    justify-content: center;  
+    
+    /* Hapus 'font-family' dan 'height' yang kaku */
 }
 /* ================== AKHIR PERBAIKAN CSS ================== */
 </style>
