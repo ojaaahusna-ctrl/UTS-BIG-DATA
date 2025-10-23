@@ -300,15 +300,19 @@ def run_model_page(page_type):
         col1, col2 = st.columns(2)
         with col1:
             st.subheader("🖼️ Gambar Asli")
-            # ================== PERBAIKAN DI SINI ==================
-            # Mengganti 'result_img_rgb' (yang belum ada) dengan 'image' (gambar asli)
+            # Ini sudah benar, menampilkan gambar asli
             st.image(image, use_container_width=True, channels="RGB", clamp=True, output_format="JPEG")
-            # ========================================================
             if st.button("🗑️ Hapus Gambar & Reset", use_container_width=True, key=f"{page_type}_reset"):
                 reset_and_rerun()
 
-        placeholder = col2.empty()
-        placeholder.info("Tekan tombol di bawah untuk memproses gambar.")
+        # ================== PERBAIKAN DI SINI ==================
+        # Kita buat DUA placeholder: satu untuk gambar, satu untuk teks/alert
+        image_placeholder = col2.empty()
+        text_placeholder = col2.empty()
+
+        # Pesan awal ditaruh di placeholder gambar
+        image_placeholder.info("Tekan tombol di bawah untuk memproses gambar.")
+        # ========================================================
 
         if st.button(button_text, use_container_width=True, key=f"{page_type}_predict"):
             with st.spinner("🧠 Menganalisis gambar..."):
@@ -322,10 +326,15 @@ def run_model_page(page_type):
                         plot_result = cv2.resize(plot_result, (orig_w, orig_h))
 
                         result_img_rgb = cv2.cvtColor(plot_result, cv2.COLOR_BGR2RGB)
-                        with placeholder.container():
+                        
+                        # ================== PERBAIKAN DI SINI ==================
+                        # Tampilkan gambar di placeholder PERTAMA
+                        with image_placeholder.container():
                             st.subheader("🎯 Hasil Deteksi")
                             st.image(result_img_rgb, use_container_width=True)
 
+                        # Tampilkan teks/alert di placeholder KEDUA
+                        with text_placeholder.container():
                             boxes = results[0].boxes
                             if len(boxes) > 0:
                                 for i, box in enumerate(boxes):
@@ -336,8 +345,11 @@ def run_model_page(page_type):
                                     st.success(f"Objek {i+1}: `{cls_name}` | Keyakinan: `{float(box.conf[0]):.2%}`")
                             else:
                                 st.success("✅ Tidak ditemukan objek 'Hotdog' → **Not-Hotdog**", icon="👍")
+                        # ========================================================
                     else:
-                        st.warning("Tidak ada hasil deteksi.")
+                        # Jika tidak ada hasil, tampilkan di placeholder pertama
+                        image_placeholder.warning("Tidak ada hasil deteksi.")
+                        text_placeholder.empty() # Kosongkan placeholder kedua
                 else:
                     CLASS_NAMES_CNN = {0: "Cheetah 🐆", 1: "Hyena 🐕"}
                     input_shape = model.input_shape[1:3]
@@ -354,11 +366,13 @@ def run_model_page(page_type):
                         pred_prob = float(np.max(preds_output))
                         preds_for_display = [float(x) for x in preds_output]
 
-                    with placeholder.container():
+                    # ================== PERBAIKAN DI SINI ==================
+                    # Tampilkan semua hasil CNN (non-gambar) di placeholder PERTAMA
+                    with image_placeholder.container():
                         st.subheader("🎯 Hasil Prediksi")
                         if pred_prob >= st.session_state.cnn_conf:
                             st.metric("Prediksi:", CLASS_NAMES_CNN[pred_idx])
-                            st.metric("Keyakinan:", f"{pred_prob:.2%}")
+                            st.metric("KeyakinAN:", f"{pred_prob:.2%}")
                             st.success(f"Gambar terdeteksi sebagai {CLASS_NAMES_CNN[pred_idx]}.", icon="✅")
                             st.subheader("📊 Distribusi Probabilitas")
                             for i, p in enumerate(preds_for_display):
@@ -366,6 +380,10 @@ def run_model_page(page_type):
                         else:
                             st.error("❌ Gambar Tidak Terdeteksi", icon="🚫")
                             st.warning(f"Keyakinan tertinggi ({pred_prob:.2%}) di bawah ambang batas ({st.session_state.cnn_conf:.2%}).")
+                    
+                    # Kosongkan placeholder KEDUA
+                    text_placeholder.empty()
+                    # ========================================================
 
 # ================== ROUTER UTAMA ==================
 if st.session_state.page == 'home':
