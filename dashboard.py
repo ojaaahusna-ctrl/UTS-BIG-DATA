@@ -151,26 +151,21 @@ button[title="View fullscreen"] {
 /* ================== PERBAIKAN DI SINI (1/3) ================== */
 /* CSS untuk kotak hasil deteksi, meniru style .stButton>button */
 .detection-result-box {
-    background-color: #319795;  /* Warna tombol */
-    color: white !important;    /* Warna teks tombol */
-    border-radius: 8px;       /* Radius tombol */
+    /* Properti yang DITIRU PERSIS dari .stButton>button */
+    background-color: #319795;
+    color: white !important;
+    border-radius: 8px;
     border: none;
+    padding: 8px 16px;        /* DIKEMBALIKAN agar sama persis dengan tombol */
+    font-weight: 700;
     
-    /* --- INI ADALAH PERUBAHAN UTAMA --- */
-    /* Kita samakan padding-nya persis dengan tombol */
-    padding: 0.5rem 1rem;       /* Mengganti '8px 16px' */
-    font-weight: 700;         /* Berat font tombol */
-    
+    /* Properti tambahan untuk layout kotak */
+    text-align: center;       /* Dibutuhkan oleh <div> */
     margin-top: 1rem;         /* Jarak dari gambar di atasnya */
     width: 100%;              /* Samakan lebar dengan tombol */
     box-sizing: border-box;   /* Pastikan padding tidak merusak lebar */
 
-    /* Mengatur perataan teks di dalam kotak */
-    display: flex;            
-    align-items: center;      
-    justify-content: center;  
-    
-    /* Hapus 'font-family' dan 'height' yang kaku */
+    /* Menghapus semua properti tinggi/flex yang salah sebelumnya */
 }
 /* ================== AKHIR PERBAIKAN CSS ================== */
 </style>
