@@ -307,7 +307,7 @@ def run_model_page(page_type):
             with st.spinner("🧠 Menganalisis gambar..."):
                 if page_type == 'yolo':
                     results = model(image, conf=confidence_threshold)
-                    plot_result = results[0].plot()
+                    plot_result = results[0].plot(show=False)
 
                     if plot_result is not None:
                         # ✅ Samakan ukuran hasil deteksi dengan ukuran gambar asli
