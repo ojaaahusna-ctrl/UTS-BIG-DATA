@@ -144,12 +144,12 @@ div[data-baseweb="input"], div[data-baseweb="textarea"] {
     color: #2D3748 !important; 
 }
 
+/* Hilangkan tombol fullscreen kecil */
 button[title="View fullscreen"] {
-    visibility: hidden;
+    display: none !important;
 }
 </style>
 """, unsafe_allow_html=True)
-
 
 # ================== LOAD MODEL ==================
 @st.cache_resource(show_spinner="📦 Memuat model YOLO...")
@@ -173,9 +173,7 @@ def clear_image_state():
     st.session_state['selected_image_bytes'] = None
 
 def reset_and_rerun():
-    """Reset state tanpa st.rerun() — aman dan tanpa error"""
     clear_image_state()
-    st.session_state['selected_image_bytes'] = None
     st.session_state['page'] = 'home'
     try:
         st.toast("✅ Gambar dihapus dan halaman direset.", icon="🗑️")
@@ -209,7 +207,7 @@ def home_page():
     st.info("Proyek ini dibuat oleh **Raudhatul Husna** sebagai bagian dari Ujian Tengah Semester.", icon="🎓")
     st.markdown('</div>', unsafe_allow_html=True)
 
-# ================== HALAMAN MODEL (Deteksi & Klasifikasi) ==================
+# ================== HALAMAN MODEL ==================
 def run_model_page(page_type):
     if page_type == 'yolo':
         title = "🌭 Deteksi Objek: Hotdog vs Not-Hotdog"
@@ -228,67 +226,15 @@ def run_model_page(page_type):
     st.header(title)
 
     if page_type == 'cnn':
-        st.info("Model ini hanya mengenali **Cheetah** dan **Hyena**. Gunakan slider di sidebar untuk atur ambang keyakinan.", icon="💡")
+        st.info("Model ini hanya mengenali **Cheetah** dan **Hyena**.", icon="💡")
     if page_type == 'yolo':
         st.info("⚠️ Model ini hanya dilatih untuk mendeteksi **Hotdog**.", icon="🌭")
 
     model = model_loader()
-    if not model:  
+    if not model:
         return
 
-    image_bytes = None
-    source_key = f"{page_type}_source"
-    upload_key = f"{page_type}_upload"
-    url_key = f"{page_type}_url_input"
-    cam_key = f"{page_type}_cam"
-
-    with st.sidebar:
-        st.title("⚙️ Pengaturan")
-        st.markdown("---")
-
-        if page_type == 'cnn':
-            st.session_state.cnn_conf = st.slider("Min. Keyakinan", 0.0, 1.0, st.session_state.cnn_conf, 0.05)
-            st.warning(f"Hasil di bawah {st.session_state.cnn_conf:.0%} akan ditolak.", icon="⚖️")
-
-        if page_type == 'yolo':
-            confidence_threshold = st.slider("Tingkat Keyakinan", 0.0, 1.0, 0.5, 0.05, key="yolo_conf")
-
-        source_choice = st.radio("Pilih sumber gambar:", ["📤 Upload File", "📸 Ambil dari Kamera", "🔗 Input URL Gambar"], key=source_key)
-
-        if source_choice == "📤 Upload File":
-            uploaded_file = st.file_uploader("Pilih gambar...", type=["jpg", "jpeg", "png"], label_visibility="collapsed", key=upload_key)
-            if uploaded_file:
-                image_bytes = uploaded_file.getvalue()
-                st.session_state['selected_image_bytes'] = image_bytes
-
-        elif source_choice == "📸 Ambil dari Kamera":
-            camera_input = st.camera_input("Arahkan kamera", key=cam_key)
-            if camera_input:
-                image_bytes = camera_input.getvalue()
-                st.session_state['selected_image_bytes'] = image_bytes
-            st.info("⚠️ Kamera hanya berfungsi di koneksi HTTPS.", icon="🛡️")
-
-        elif source_choice == "🔗 Input URL Gambar":
-            url = st.text_input("Masukkan URL Gambar:", value=st.session_state.get(url_key, ''), key=url_key)
-            if url:
-                if not re.match(r'https?://[^\s/$.?#].[^\s]*$', url):
-                    st.error("❌ URL tidak valid.", icon="⚠️")
-                else:
-                    try:
-                        with st.spinner("Mengunduh gambar..."):
-                            response = requests.get(url, timeout=10)
-                            response.raise_for_status()
-                            if 'image' not in response.headers.get('Content-Type', '').lower():
-                                st.error("❌ URL bukan file gambar valid.", icon="⚠️")
-                            else:
-                                image_bytes = response.content
-                                st.session_state['selected_image_bytes'] = image_bytes
-                                st.success("✅ Gambar berhasil diunduh.", icon="🌐")
-                    except Exception as e:
-                        st.error(f"Gagal mengunduh gambar: {e}")
-
-    if image_bytes is None:
-        image_bytes = st.session_state.get('selected_image_bytes')
+    image_bytes = st.session_state.get('selected_image_bytes')
 
     if image_bytes:
         try:
@@ -300,25 +246,24 @@ def run_model_page(page_type):
         col1, col2 = st.columns(2)
         with col1:
             st.subheader("🖼️ Gambar Asli")
-            st.image(result_img_rgb, use_container_width=True, channels="RGB", clamp=True, output_format="JPEG")
-            if st.button("🗑️ Hapus Gambar & Reset", use_container_width=True, key=f"{page_type}_reset"):
+            st.image(image, use_container_width=True)
+            if st.button("🗑️ Hapus Gambar & Reset", use_container_width=True):
                 reset_and_rerun()
 
         placeholder = col2.empty()
         placeholder.info("Tekan tombol di bawah untuk memproses gambar.")
 
-        if st.button(button_text, use_container_width=True, key=f"{page_type}_predict"):
+        if st.button(button_text, use_container_width=True):
             with st.spinner("🧠 Menganalisis gambar..."):
                 if page_type == 'yolo':
-                    results = model(image, conf=confidence_threshold)
+                    results = model(image, conf=0.5)
                     plot_result = results[0].plot(show=False)
 
                     if plot_result is not None:
-                        # ✅ Samakan ukuran hasil deteksi dengan ukuran gambar asli
                         orig_w, orig_h = image.size
                         plot_result = cv2.resize(plot_result, (orig_w, orig_h))
-
                         result_img_rgb = cv2.cvtColor(plot_result, cv2.COLOR_BGR2RGB)
+
                         with placeholder.container():
                             st.subheader("🎯 Hasil Deteksi")
                             st.image(result_img_rgb, use_container_width=True)
@@ -326,10 +271,7 @@ def run_model_page(page_type):
                             boxes = results[0].boxes
                             if len(boxes) > 0:
                                 for i, box in enumerate(boxes):
-                                    try:
-                                        cls_name = model.names[int(box.cls)]
-                                    except Exception:
-                                        cls_name = str(int(box.cls))
+                                    cls_name = model.names.get(int(box.cls), str(int(box.cls)))
                                     st.success(f"Objek {i+1}: `{cls_name}` | Keyakinan: `{float(box.conf[0]):.2%}`")
                             else:
                                 st.success("✅ Tidak ditemukan objek 'Hotdog' → **Not-Hotdog**", icon="👍")
@@ -340,31 +282,15 @@ def run_model_page(page_type):
                     input_shape = model.input_shape[1:3]
                     img_array = np.expand_dims(np.array(image.resize(input_shape)) / 255.0, axis=0)
                     preds_output = model.predict(img_array, verbose=0)[0]
-
-                    if len(preds_output) == 1:
-                        prob = float(preds_output[0])
-                        pred_idx = 1 if prob > 0.5 else 0
-                        pred_prob = max(prob, 1-prob)
-                        preds_for_display = [1-prob, prob]
-                    else:
-                        pred_idx = int(np.argmax(preds_output))
-                        pred_prob = float(np.max(preds_output))
-                        preds_for_display = [float(x) for x in preds_output]
+                    pred_idx = int(np.argmax(preds_output))
+                    pred_prob = float(np.max(preds_output))
 
                     with placeholder.container():
                         st.subheader("🎯 Hasil Prediksi")
-                        if pred_prob >= st.session_state.cnn_conf:
-                            st.metric("Prediksi:", CLASS_NAMES_CNN[pred_idx])
-                            st.metric("Keyakinan:", f"{pred_prob:.2%}")
-                            st.success(f"Gambar terdeteksi sebagai {CLASS_NAMES_CNN[pred_idx]}.", icon="✅")
-                            st.subheader("📊 Distribusi Probabilitas")
-                            for i, p in enumerate(preds_for_display):
-                                st.progress(float(p), text=f"{CLASS_NAMES_CNN[i]}: {p:.2%}")
-                        else:
-                            st.error("❌ Gambar Tidak Terdeteksi", icon="🚫")
-                            st.warning(f"Keyakinan tertinggi ({pred_prob:.2%}) di bawah ambang batas ({st.session_state.cnn_conf:.2%}).")
+                        st.metric("Prediksi:", CLASS_NAMES_CNN[pred_idx])
+                        st.metric("Keyakinan:", f"{pred_prob:.2%}")
 
-# ================== ROUTER UTAMA ==================
+# ================== ROUTER ==================
 if st.session_state.page == 'home':
     home_page()
 elif st.session_state.page == 'yolo':
@@ -373,12 +299,9 @@ elif st.session_state.page == 'cnn':
     run_model_page('cnn')
 
 # ================== FOOTER ==================
-st.markdown(
-    """
-    <hr>
-    <div style='text-align:center; font-size:0.9em; color:gray; margin-top:16px;'>
-        © 2025 VisionCraft — Made with ❤️ by Raudhatul Husna
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+st.markdown("""
+<hr>
+<div style='text-align:center; font-size:0.9em; color:gray; margin-top:16px;'>
+    © 2025 VisionCraft — Made with ❤️ by Raudhatul Husna
+</div>
+""", unsafe_allow_html=True)
