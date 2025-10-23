@@ -148,16 +148,20 @@ button[title="View fullscreen"] {
     visibility: hidden;
 }
 
-/* CSS untuk kotak sukses kustom kita */
-.custom-success-box {
-    background-color: #D4EDDA;
-    border: 1px solid #C3E6CB;
-    color: #155724;
-    padding: 0.75rem 1.25rem;
-    border-radius: 0.25rem;
-    margin-top: 1rem;
+/* ================== PERBAIKAN DI SINI (1/3) ================== */
+/* CSS untuk kotak hasil deteksi, meniru style .stButton>button */
+.detection-result-box {
+    background-color: #319795;  /* Warna tombol */
+    color: white !important;    /* Warna teks tombol */
+    border-radius: 8px;       /* Radius tombol */
+    border: none;
+    padding: 8px 16px;        /* Padding tombol */
+    font-weight: 700;         /* Berat font tombol */
+    text-align: center;       /* Teks di tengah */
+    margin-top: 1rem;         /* Jarak dari gambar di atasnya */
     font-family: 'Inter', sans-serif;
 }
+/* ================== AKHIR PERBAIKAN CSS ================== */
 </style>
 """, unsafe_allow_html=True)
 
@@ -349,16 +353,16 @@ def run_model_page(page_type):
                                     except Exception:
                                         cls_name = str(int(box.cls))
                                     
-                                    # ================== PERBAIKAN DI SINI (1/2) ==================
+                                    # ================== PERBAIKAN DI SINI (2/3) ==================
                                     # Mengganti st.success dengan st.markdown HTML
-                                    text = f"Objek {i+1}: <b>{cls_name}</b> | Keyakinan: <b>{float(box.conf[0]):.2%}</b>"
-                                    st.markdown(f'<div class="custom-success-box">{text}</div>', unsafe_allow_html=True)
+                                    text = f"🎯 Objek {i+1}: <b>{cls_name}</b> | Keyakinan: <b>{float(box.conf[0]):.2%}</b>"
+                                    st.markdown(f'<div class="detection-result-box">{text}</div>', unsafe_allow_html=True)
                                     
                             else:
-                                # ================== PERBAIKAN DI SINI (2/2) ==================
+                                # ================== PERBAIKAN DI SINI (3/3) ==================
                                 # Mengganti st.success dengan st.markdown HTML
                                 text = f"✅ Tidak ditemukan objek 'Hotdog' → <b>Not-Hotdog</b>"
-                                st.markdown(f'<div class="custom-success-box">{text}</div>', unsafe_allow_html=True)
+                                st.markdown(f'<div class="detection-result-box">{text}</div>', unsafe_allow_html=True)
                     else:
                         # Jika tidak ada hasil, tulis warning ke col2
                         with col2:
