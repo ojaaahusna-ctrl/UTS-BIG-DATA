@@ -168,7 +168,7 @@ button[title="View fullscreen"] {
     display: flex;            /* Aktifkan flexbox */
     align-items: center;      /* Pusatkan konten secara vertikal */
     justify-content: center;  /* Pusatkan konten secara horizontal */
-    min-height: 2.4rem;       /* Samakan tinggi minimum dengan tombol Streamlit */
+    height: 2.4rem;           /* Samakan TINGGI (height) dengan tombol Streamlit */
 }
 /* ================== AKHIR PERBAIKAN CSS ================== */
 </style>
