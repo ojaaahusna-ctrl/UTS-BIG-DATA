@@ -224,12 +224,12 @@ def run_model_page(page_type):
     st.header(title)
 
     if page_type == 'cnn':
-        st.info("Model ini hanya mengenali **Cheetah** dan **Hyena**.", icon="💡")
+        st.info("Model ini hanya mengenali **Cheetah** dan **Hyena**. Gunakan slider di sidebar untuk atur ambang keyakinan.", icon="💡")
     if page_type == 'yolo':
         st.info("⚠️ Model ini hanya dilatih untuk mendeteksi **Hotdog**.", icon="🌭")
 
     model = model_loader()
-    if not model: 
+    if not model:  
         return
 
     image_bytes = None
@@ -247,7 +247,7 @@ def run_model_page(page_type):
             st.warning(f"Hasil di bawah {st.session_state.cnn_conf:.0%} akan ditolak.", icon="⚖️")
 
         if page_type == 'yolo':
-            confidence_threshold = st.slider("Tingkat Keyakinan", 0.0, 1.0, 0.1, 0.05, key="yolo_conf")
+            confidence_threshold = st.slider("Tingkat Keyakinan", 0.0, 1.0, 0.5, 0.05, key="yolo_conf")
 
         source_choice = st.radio("Pilih sumber gambar:", ["📤 Upload File", "📸 Ambil dari Kamera", "🔗 Input URL Gambar"], key=source_key)
 
@@ -310,17 +310,15 @@ def run_model_page(page_type):
                     plot_result = results[0].plot()
 
                     if plot_result is not None:
-                        try:
-                            orig_w, orig_h = image.size
-                            plot_result = cv2.resize(plot_result, (orig_w, orig_h))
-                            result_img_rgb = cv2.cvtColor(plot_result, cv2.COLOR_BGR2RGB)
-                        except Exception as e:
-                            st.warning(f"⚠️ Gagal memproses gambar: {e}")
-                            result_img_rgb = plot_result
+                        # ✅ Samakan ukuran hasil deteksi dengan ukuran gambar asli
+                        orig_w, orig_h = image.size
+                        plot_result = cv2.resize(plot_result, (orig_w, orig_h))
 
+                        result_img_rgb = cv2.cvtColor(plot_result, cv2.COLOR_BGR2RGB)
                         with placeholder.container():
                             st.subheader("🎯 Hasil Deteksi")
                             st.image(result_img_rgb, use_container_width=True)
+
                             boxes = results[0].boxes
                             if len(boxes) > 0:
                                 for i, box in enumerate(boxes):
