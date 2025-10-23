@@ -148,31 +148,8 @@ button[title="View fullscreen"] {
     visibility: hidden;
 }
 
-/* ================== PERBAIKAN DI SINI (1/3) ================== */
-/* CSS untuk kotak hasil deteksi, meniru style .stButton>button */
-.detection-result-box {
-    /* 1. Properti style dari .stButton>button Anda */
-    background-color: #319795;
-    color: white !important;
-    border-radius: 8px;
-    border: none;
-    padding: 8px 16px;
-    font-weight: 700;
-    
-    /* 2. Properti untuk layout */
-    width: 100%;
-    box-sizing: border-box;
-    margin-top: 1rem;
+/* ================== CSS BERMASALAH TELAH DIHAPUS ================== */
 
-    /* 3. KUNCI PERBAIKAN ALIGNMENT (INI YANG BARU) */
-    /* Samakan tinggi minimum dengan tombol Streamlit */
-    min-height: 2.4rem; 
-    /* Pusatkan teks di tengah (vertikal & horizontal) */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-/* ================== AKHIR PERBAIKAN CSS ================== */
 </style>
 """, unsafe_allow_html=True)
 
@@ -297,7 +274,7 @@ def run_model_page(page_type):
         elif source_choice == "🔗 Input URL Gambar":
             url = st.text_input("Masukkan URL Gambar:", value=st.session_state.get(url_key, ''), key=url_key)
             if url:
-                if not re.match(r'httpsK?://[^\s/$.?#].[^\s]*$', url):
+                if not re.match(r'https?://[^\s/$.?#].[^\s]*$', url):
                     st.error("❌ URL tidak valid.", icon="⚠️")
                 else:
                     try:
@@ -364,14 +341,15 @@ def run_model_page(page_type):
                                     except Exception:
                                         cls_name = str(int(box.cls))
                                     
-                                    # --- KEMBALI KE KOTAK KUSTOM ANDA ---
-                                    text = f"🎯 Objek {i+1}: <b>{cls_name}</b> | Keyakinan: <b>{float(box.conf[0]):.2%}</b>"
-                                    st.markdown(f'<div class="detection-result-box">{text}</div>', unsafe_allow_html=True)
+                                    # --- SOLUSI BARU: Menggunakan st.info ---
+                                    # Tulisannya bisa pakai Markdown (bold)
+                                    text = f"Objek {i+1}: **{cls_name}** | Keyakinan: **{float(box.conf[0]):.2%}**"
+                                    st.info(text, icon="🎯")
                                     
                             else:
-                                # --- KEMBALI KE KOTAK KUSTOM ANDA ---
-                                text = f"✅ Tidak ditemukan objek 'Hotdog' → <b>Not-Hotdog</b>"
-                                st.markdown(f'<div class="detection-result-box">{text}</div>', unsafe_allow_html=True)
+                                # --- SOLUSI BARU: Menggunakan st.success ---
+                                text = f"Tidak ditemukan objek 'Hotdog' → **Not-Hotdog**"
+                                st.success(text, icon="✅")
                     else:
                         # Jika tidak ada hasil, tulis warning ke col2
                         with col2:
