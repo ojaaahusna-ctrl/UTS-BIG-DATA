@@ -148,7 +148,6 @@ button[title="View fullscreen"] {
     visibility: hidden;
 }
 
-/* ================== PERBAIKAN DI SINI (1/3) ================== */
 /* CSS untuk kotak hasil deteksi, meniru style .stButton>button */
 .detection-result-box {
     background-color: #319795;  /* Warna tombol */
@@ -161,7 +160,6 @@ button[title="View fullscreen"] {
     margin-top: 1rem;         /* Jarak dari gambar di atasnya */
     font-family: 'Inter', sans-serif;
 }
-/* ================== AKHIR PERBAIKAN CSS ================== */
 </style>
 """, unsafe_allow_html=True)
 
@@ -319,16 +317,16 @@ def run_model_page(page_type):
             if st.button("🗑️ Hapus Gambar & Reset", use_container_width=True, key=f"{page_type}_reset"):
                 reset_and_rerun()
         
-        # Buat placeholder HANYA untuk pesan awal
+        # ================== PERBAIKAN LOGIKA DI SINI ==================
+        
+        # 1. Buat placeholder di col2
         placeholder = col2.empty()
+        # 2. Isi placeholder dengan pesan awal
         placeholder.info("Tekan tombol di bawah untuk memproses gambar.")
 
         if st.button(button_text, use_container_width=True, key=f"{page_type}_predict"):
             with st.spinner("🧠 Menganalisis gambar..."):
                 
-                # HAPUS pesan awal ("Tekan tombol...")
-                placeholder.empty()
-
                 if page_type == 'yolo':
                     results = model(image, conf=confidence_threshold)
                     plot_result = results[0].plot(show=False)
@@ -338,13 +336,13 @@ def run_model_page(page_type):
                         plot_result = cv2.resize(plot_result, (orig_w, orig_h))
                         result_img_rgb = cv2.cvtColor(plot_result, cv2.COLOR_BGR2RGB)
                         
-                        # Tulis hasil LANGSUNG ke col2 secara berurutan
-                        with col2:
+                        # 3. Ganti isi placeholder dengan 'container' baru
+                        with placeholder.container():
                             st.subheader("🎯 Hasil Deteksi")
-                            # Tampilkan GAMBAR DULU
+                            # 4. Tulis gambar DULU
                             st.image(result_img_rgb, use_container_width=True, channels="RGB", output_format="JPEG")
 
-                            # Tampilkan TEKS/ALERT di bawahnya
+                            # 5. Tulis teks/alert DI BAWAHNYA
                             boxes = results[0].boxes
                             if len(boxes) > 0:
                                 for i, box in enumerate(boxes):
@@ -353,19 +351,15 @@ def run_model_page(page_type):
                                     except Exception:
                                         cls_name = str(int(box.cls))
                                     
-                                    # ================== PERBAIKAN DI SINI (2/3) ==================
-                                    # Mengganti st.success dengan st.markdown HTML
                                     text = f"🎯 Objek {i+1}: <b>{cls_name}</b> | Keyakinan: <b>{float(box.conf[0]):.2%}</b>"
                                     st.markdown(f'<div class="detection-result-box">{text}</div>', unsafe_allow_html=True)
                                     
                             else:
-                                # ================== PERBAIKAN DI SINI (3/3) ==================
-                                # Mengganti st.success dengan st.markdown HTML
                                 text = f"✅ Tidak ditemukan objek 'Hotdog' → <b>Not-Hotdog</b>"
                                 st.markdown(f'<div class="detection-result-box">{text}</div>', unsafe_allow_html=True)
                     else:
-                        # Jika tidak ada hasil, tulis warning ke col2
-                        with col2:
+                        # Jika tidak ada hasil, ganti isi placeholder
+                        with placeholder.container():
                             st.warning("Tidak ada hasil deteksi.")
                 
                 else: # page_type == 'cnn'
@@ -384,8 +378,8 @@ def run_model_page(page_type):
                         pred_prob = float(np.max(preds_output))
                         preds_for_display = [float(x) for x in preds_output]
 
-                    # Tulis hasil LANGSUNG ke col2
-                    with col2:
+                    # 3. Ganti isi placeholder dengan 'container' baru
+                    with placeholder.container():
                         st.subheader("🎯 Hasil Prediksi")
                         if pred_prob >= st.session_state.cnn_conf:
                             st.metric("Prediksi:", CLASS_NAMES_CNN[pred_idx])
