@@ -249,7 +249,7 @@ def run_model_page(page_type):
             st.warning(f"Hasil di bawah {st.session_state.cnn_conf:.0%} akan ditolak.", icon="⚖️")
 
         if page_type == 'yolo':
-            confidence_threshold = st.slider("Tingkat Keyakinan", 0.0, 1.0, 0.5, 0.05, key="yolo_conf")
+            confidence_threshold = st.slider("Tingkat Keyakinan", 0.0, 1.0, 0.1, 0.05, key="yolo_conf")
 
         source_choice = st.radio("Pilih sumber gambar:", ["📤 Upload File", "📸 Ambil dari Kamera", "🔗 Input URL Gambar"], key=source_key)
 
