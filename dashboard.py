@@ -160,11 +160,15 @@ button[title="View fullscreen"] {
     text-align: center;       /* Teks di tengah */
     margin-top: 1rem;         /* Jarak dari gambar di atasnya */
     font-family: 'Inter', sans-serif;
+    
+    width: 100%;              /* Samakan lebar dengan tombol */
+    box-sizing: border-box;   /* Pastikan padding tidak merusak lebar */
 
-    /* ===== INI ADALAH PERUBAHAN UNTUK MENYEJAJARKAN ===== */
-    width: 100%;
-    box-sizing: border-box;
-    /* ===== AKHIR PERUBAHAN ===== */
+    /* ===== INI ADALAH PERUBAHAN UNTUK MENYAMAKAN TINGGI ===== */
+    display: flex;            /* Aktifkan flexbox */
+    align-items: center;      /* Pusatkan konten secara vertikal */
+    justify-content: center;  /* Pusatkan konten secara horizontal */
+    min-height: 2.4rem;       /* Samakan tinggi minimum dengan tombol Streamlit */
 }
 /* ================== AKHIR PERBAIKAN CSS ================== */
 </style>
